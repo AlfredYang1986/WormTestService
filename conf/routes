@@ -1,0 +1,64 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Sample 
+POST     /sample/push                controllers.SampleController.pushSample
+POST	 /sample/update				 controllers.SampleController.updateSample
+POST	 /sample/image/push			 controllers.SampleController.pushSampleImage
+POST	 /sample/image/select		 controllers.SampleController.selectSampleImage
+POST	 /sample/image/pop 			 controllers.SampleController.popSampleImage
+
+POST	 /sample/query/at			 controllers.SampleController.queryTestedSample
+POST	 /sample/query/nt			 controllers.SampleController.queryNotTestSample
+POST	 /sample/query/id			 controllers.SampleController.querySampleWithID
+
+POST 	 /sample/complish			 controllers.SampleController.sampleTestComplished
+POST	 /sample/publish			 controllers.SampleController.sampleTestComplished
+
+POST	 /sample/result/push 		 controllers.SampleController.samplePushTestResult
+
+POST	 /sample/search				 controllers.SampleController.sampleConditionSearch
+
+# Patient
+POST	 /patient/push				 controllers.PatientController.pushPatient
+POST	 /patient/update			 controllers.PatientController.updatePatient
+POST	 /patient/query				 controllers.PatientController.queryPatient
+
+# Auth
+POST	 /auth/register				 controllers.AuthController.register
+POST	 /auth/login				 controllers.AuthController.login
+POST	 /auth/doctors/lst			 controllers.AuthController.lstDoctors
+
+# wrom
+POST 	 /worm/categoies/query		 controllers.WromController.wormCategories
+POST 	 /worm/categoies/only 		 controllers.WromController.onlyCategories
+POST	 /worm/categories/push		 controllers.WromController.pushWormCategory
+POST	 /worm/categories/pop		 controllers.WromController.popWormCategory
+
+POST 	 /worm/push					 controllers.WromController.pushWorm
+POST	 /worm/pop					 controllers.WromController.popWorm
+POST	 /worm/query				 controllers.WromController.queryWorm
+POST	 /worm/setting				 controllers.WromController.wormSetting
+POST	 /worm/description/update	 controllers.WromController.updateDescription
+POST	 /worm/images/query			 controllers.WromController.queryWormImages
+POST	 /worm/images/push			 controllers.WromController.pushWormImage
+POST	 /worm/images/pop			 controllers.WromController.popWormImage
+
+POST	 /worm/reporting			 controllers.WromController.wormSettingQuery
+
+# files
+POST	/file/upload				controllers.FileController.upload
+GET		/images/:name				controllers.FileController.downloadFile(name)
+
+# config
+POST	/config/resource/push		controllers.ConfigController.pushResourceType
+POST	/config/resource/pop		controllers.ConfigController.popResourceType
+POST	/config/resource/query		controllers.ConfigController.queryResourceType
+
+POST	/config/patient/push		controllers.ConfigController.pushPatientType
+POST	/config/patient/pop			controllers.ConfigController.popPatientType
+POST	/config/patient/query		controllers.ConfigController.queryPatientType
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
