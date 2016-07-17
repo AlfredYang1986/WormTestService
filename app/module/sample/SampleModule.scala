@@ -135,7 +135,7 @@ object SampleModule {
               case head :: Nil => {
                   val result = updateDBObject(data, head)
                   _data_connection.getCollection("sample").update(DBObject("sample_id" -> sample_id), result)
-                  toJson(Map("status" -> toJson("ok"), "method" -> toJson("updateSample"), "result" -> toJson("update success")))
+                  toJson(Map("status" -> toJson("ok"), "method" -> toJson("updateSample"), "result" -> toJson(DB2JsValue(head))))
               }
               case _ => ErrorCode.errorToJson("sample exist")
             }
@@ -197,9 +197,10 @@ object SampleModule {
 
     def queryTestedSample(data : JsValue) : JsValue = {
         try {
-            val status = sampleStatus.tested.t
+//            val status = sampleStatus.tested.t
+            val status = sampleStatus.not_test.t
             toJson(Map("status" -> toJson("ok"), "method" -> toJson("queryTestedSample"), "result" -> toJson(
-                  (from db() in "sample" where ("status" -> status) select (DB2JsValue(_))).toList)))
+                  (from db() in "sample" where ("status" $ne status) select (DB2JsValue(_))).toList)))
           
         } catch {
           case ex : Exception => ErrorCode.errorToJson(ex.getMessage)

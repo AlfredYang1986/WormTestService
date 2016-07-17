@@ -71,8 +71,6 @@ object AuthModule {
     def adminMasterCreate = {
         val seed = "Alfred Yang"
         val admin = "admin"
-     
-        println("fjalsd")
         
         val admin_builder = MongoDBObject.newBuilder
         val user_id = Sercurity.md5Hash(admin + Sercurity.getTimeSpanWithMillSeconds)
