@@ -156,10 +156,10 @@ object AuthModule {
         }
    
     def lstDoctors(data : JsValue) : JsValue = {
-        val auth = (data \ "auth").asOpt[Int].map (x => x).getOrElse(authTypes.normal_doctor.t)
+//        val auth = (data \ "auth").asOpt[Int].map (x => x).getOrElse(authTypes.normal_doctor.t)
        
-        toJson(Map("status" -> toJson("ok"), "mothod" -> toJson("lstDoctor"), "result" -> toJson(
-            (from db() in "users" where ("auth" -> auth) select (x => x.getAs[String]("user_name"))).toList)))
+        toJson(Map("status" -> toJson("ok"), "method" -> toJson("lstDoctor"), "result" -> toJson(
+            (from db() in "users" /*where ("auth" -> auth)*/ select (x => x.getAs[String]("user_name"))).toList)))
     }
         
     def queryProfile(open_id : String, user_id : String, data : JsValue) : JsValue = {
