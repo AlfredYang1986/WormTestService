@@ -296,7 +296,7 @@ object SampleModule {
                                                                       
        try {
            var condition : DBObject = null
-           (data \ "time").asOpt[Long].map (x => condition = pushCondition(condition, "date" $eq x / (24 * 60 * 60 * 1000))).getOrElse(Unit)
+           (data \ "time").asOpt[Long].map (x => condition = pushCondition(condition, "date" $eq 1 + x / (24 * 60 * 60 * 1000))).getOrElse(Unit)
            (data \ "testing_doctor").asOpt[String].map (x => condition = pushCondition(condition, "testing_doctor" $eq x)).getOrElse(Unit)
            (data \ "sample_id").asOpt[String].map (x => condition = pushCondition(condition, "sample_id" $eq x)).getOrElse(Unit)
            (data \ "post_test_doctor").asOpt[String].map (x => condition = pushCondition(condition, "post_test_doctor" $eq x)).getOrElse(Unit)
