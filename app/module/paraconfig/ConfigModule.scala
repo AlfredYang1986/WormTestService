@@ -113,7 +113,7 @@ object ConfigModule {
                 val patient_lst = head.getAs[MongoDBList]("patient_type").get.toList.asInstanceOf[List[String]]
                 head += "patient_type" -> patient_lst.filterNot (_.equals(patient))
                 _data_connection.getCollection("config").update(DBObject("index" -> 0), head)
-                toJson(Map("status" -> toJson("ok"), "method" -> toJson("popPatientType"), "result" -> toJson("push config success")))
+                toJson(Map("status" -> toJson("ok"), "method" -> toJson("popPatientType"), "result" -> toJson("pop config success")))
               }
               case Nil => {
                 setupDefaultConfig

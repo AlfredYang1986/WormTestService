@@ -12,6 +12,6 @@ object ConfigController extends Controller {
     def queryResourceType = Action (request => requestArgs(request)(ConfigModule.queryResourceType))
     
     def pushPatientType = Action (request => requestArgs(request)(ConfigModule.pushPatientType))
-    def popPatientType = Action (request => requestArgs(request)(ConfigModule.pushPatientType))
+    def popPatientType = Action (request => requestArgs(request)(ConfigModule.popPatientType))
     def queryPatientType = Action (request => requestArgs(request)(ConfigModule.queryPatientType))
 }
