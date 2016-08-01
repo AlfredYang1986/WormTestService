@@ -86,7 +86,9 @@ object WormModule {
               case None => throw new Exception("error")
               case Some(x) => {
                   _data_connection.getCollection("worms") += x
-                  toJson(Map("status" -> toJson("ok"), "method" -> toJson("pushWorm"), "result" -> toJson("push worm success")))
+                  toJson(Map("status" -> toJson("ok"), "method" -> toJson("pushWorm"), 
+                             "result" -> toJson(Map("name" -> toJson((data \ "name").asOpt[String].get),
+                                                    "cat" -> toJson((data \ "cat").asOpt[String].get)))))
               }
             }
         } catch {
@@ -102,7 +104,7 @@ object WormModule {
               case Nil => throw new Exception("not exist")
               case head :: Nil => {
                   _data_connection.getCollection("worms") -= head
-                  toJson(Map("status" -> toJson("ok"), "method" -> toJson("popWorm"), "result" -> toJson("pop worm success")))
+                  toJson(Map("status" -> toJson("ok"), "method" -> toJson("popWorm"), "result" -> toJson((data \ "name").asOpt[String].get)))
               }
             }
         } catch {
@@ -206,6 +208,23 @@ object WormModule {
                   toJson(Map("status" -> toJson("ok"), "method" -> toJson("popWormImage"), "result" -> toJson(Map("name" -> worm_name, "image" -> image))))
               }
             }
+        } catch {
+          case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
+        }
+    }
+    
+    def wormSourceImport(data : JsValue) : JsValue = {
+        try {
+            if (_data_connection.isExisted("worm_cat")) {
+                _data_connection.getCollection("worm_cat").drop()
+            }
+            
+            if (_data_connection.isExisted("worms")) {
+                _data_connection.getCollection("worms").drop()
+            }
+            
+            toJson(Map("status" -> toJson("ok"), "method" -> toJson("wormSourceImport"), "result" -> toJson("success")))
+          
         } catch {
           case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
         }

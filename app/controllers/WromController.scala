@@ -23,4 +23,6 @@ object WromController extends Controller {
     
     def pushWormImage = Action (request => requestArgs(request)(WormModule.pushWormImage))
     def popWormImage = Action (request => requestArgs(request)(WormModule.popWormImage))
+    
+    def wormSrouceImport = Action (request => requestArgs(request)(WormModule.wormSourceImport))
 }

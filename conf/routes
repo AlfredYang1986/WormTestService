@@ -50,6 +50,8 @@ POST	 /worm/images/pop			 controllers.WromController.popWormImage
 
 POST	 /worm/reporting			 controllers.WromController.wormSettingQuery
 
+POST	 /worm/source/import		 controllers.WromController.wormSrouceImport
+
 # files
 POST	/file/upload				controllers.FileController.upload
 GET		/images/:name				controllers.FileController.downloadFile(name)
