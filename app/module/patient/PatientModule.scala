@@ -24,7 +24,11 @@ object PatientModule {
         toJson(Map("patient_id" -> toJson(obj.getAs[String]("patient_id").get),
                    "patient_name" -> toJson(obj.getAs[String]("patient_name").get),
                    "patient_gender" -> toJson(obj.getAs[Number]("patient_gender").get.intValue),
-                   "patient_age" -> toJson(obj.getAs[Number]("patient_age").get.intValue)))
+                   "patient_age" -> toJson(obj.getAs[Number]("patient_age").get.intValue),
+                   "patient_section" -> toJson(obj.getAs[String]("patient_section").get),
+                   "patient_section_no" -> toJson(obj.getAs[String]("patient_section_no").get),
+                   "patient_bed_no" -> toJson(obj.getAs[String]("patient_bed_no").get)
+                   ))
     
     def pushPatient(data : JsValue) : JsValue = {
         
@@ -35,6 +39,10 @@ object PatientModule {
             (data \ "patient_name").asOpt[String].map (x => builder += "patient_name" -> x).getOrElse(throw new Exception("patient_name exist"))
             (data \ "patient_gender").asOpt[Int].map (x => builder += "patient_gender" -> x.asInstanceOf[Number]).getOrElse(builder += "patient_gender" -> gender.male.t)
             (data \ "patient_age").asOpt[Int].map (x => builder += "patient_age" -> x.asInstanceOf[Number]).getOrElse(builder += "patient_age" -> 0)
+           
+            (data \ "patient_section").asOpt[String].map (x => builder += "patient_section" -> x).getOrElse(builder += "patient_section" -> "")
+            (data \ "patient_section_no").asOpt[String].map (x => builder += "patient_section_no" -> x).getOrElse(builder += "patient_section_no" -> "")
+            (data \ "patient_bed_no").asOpt[String].map (x => builder += "patient_bed_no" -> x).getOrElse(builder += "patient_bed_no" -> "")
             
             builder.result
         }
