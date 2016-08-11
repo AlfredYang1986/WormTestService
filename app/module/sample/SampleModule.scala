@@ -44,6 +44,8 @@ object SampleModule {
                    "post_test_doctor" -> toJson(obj.getAs[String]("post_test_doctor").get),
                   
                    "status" -> toJson(obj.getAs[Number]("status").get.intValue),
+                   "section" -> toJson(obj.getAs[String]("section").get),
+                   "index" -> toJson(obj.getAs[Int]("index").get.intValue),
                    
                    "patient" -> toJson(patient)))
     }
@@ -63,6 +65,9 @@ object SampleModule {
         (data \ "pre_test_doctor").asOpt[String].map (tmp => obj += "pre_test_doctor" -> tmp).getOrElse(Unit)
         (data \ "testing_doctor").asOpt[String].map (tmp => obj += "testing_doctor" -> tmp).getOrElse(Unit)
         (data \ "post_test_doctor").asOpt[String].map (tmp => obj += "post_test_doctor" -> tmp).getOrElse(Unit)
+
+        (data \ "section").asOpt[String].map (tmp => obj += "section" -> tmp).getOrElse(Unit)
+        (data \ "index").asOpt[Int].map (tmp => obj += "index" -> tmp.asInstanceOf[Number]).getOrElse(Unit)
         
         obj
     }
@@ -89,6 +94,8 @@ object SampleModule {
             (data \ "treatment").asOpt[String].map (tmp => builder += "treatment" -> tmp).getOrElse(builder += "treatment" -> "")
             (data \ "advise").asOpt[String].map (tmp => builder += "advise" -> tmp).getOrElse(builder += "advise" -> "")
             (data \ "des").asOpt[String].map (tmp => builder += "des" -> tmp).getOrElse(builder += "des" -> "")
+            (data \ "section").asOpt[String].map (tmp => builder += "section" -> tmp).getOrElse(builder += "section" -> "")
+            (data \ "index").asOpt[Int].map (tmp => builder += "index" -> tmp).getOrElse(builder += "index" -> 0)
            
             builder += "index_of_day" -> (from db() in "sample" where ("date" -> new Date().getTime / (24 * 60 * 60 * 1000)) select (x => x)).count
             builder += "status" -> sampleStatus.not_test.t
@@ -197,10 +204,10 @@ object SampleModule {
 
     def queryTestedSample(data : JsValue) : JsValue = {
         try {
-//            val status = sampleStatus.tested.t
             val status = sampleStatus.not_test.t
-            toJson(Map("status" -> toJson("ok"), "method" -> toJson("queryTestedSample"), "result" -> toJson(
-                  (from db() in "sample" where ("status" $ne status) select (DB2JsValue(_))).toList)))
+            val reVal = ((from db() in "sample" where ("status" $ne status) select (DB2JsValue(_))).toList)
+            val reVal_s = reVal.sortBy (x => (x \ "status").asOpt[Int].get)
+            toJson(Map("status" -> toJson("ok"), "method" -> toJson("queryTestedSample"), "result" -> toJson(reVal_s)))
           
         } catch {
           case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
