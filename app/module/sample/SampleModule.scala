@@ -46,6 +46,8 @@ object SampleModule {
                    "status" -> toJson(obj.getAs[Number]("status").get.intValue),
                    "section" -> toJson(obj.getAs[String]("section").get),
                    "index" -> toJson(obj.getAs[Int]("index").get.intValue),
+
+                   "index_of_day" -> toJson(obj.getAs[Int]("index_of_day").get.intValue),
                    
                    "patient" -> toJson(patient)))
     }
@@ -68,7 +70,7 @@ object SampleModule {
 
         (data \ "section").asOpt[String].map (tmp => obj += "section" -> tmp).getOrElse(Unit)
         (data \ "index").asOpt[Int].map (tmp => obj += "index" -> tmp.asInstanceOf[Number]).getOrElse(Unit)
-        
+
         obj
     }
   
@@ -97,9 +99,10 @@ object SampleModule {
             (data \ "section").asOpt[String].map (tmp => builder += "section" -> tmp).getOrElse(builder += "section" -> "")
             (data \ "index").asOpt[Int].map (tmp => builder += "index" -> tmp).getOrElse(builder += "index" -> 0)
            
-            builder += "index_of_day" -> (from db() in "sample" where ("date" -> new Date().getTime / (24 * 60 * 60 * 1000)) select (x => x)).count
+            val date = new Date().getTime / (24 * 60 * 60 * 1000)
+            builder += "index_of_day" -> (from db() in "sample" where ("date" -> date) select (x => x)).count
             builder += "status" -> sampleStatus.not_test.t
-            builder += "date" -> new Date().getTime / (24 * 60 * 60 * 1000)
+            builder += "date" -> date
             builder += "images" -> MongoDBList.newBuilder.result
             builder += "result" -> MongoDBList.newBuilder.result
 
@@ -286,7 +289,7 @@ object SampleModule {
                                                                      
        def queryPatient(data : JsValue) : List[String] = {
            var condition : DBObject = null
-           (data \ "patient_id").asOpt[String].map(x => condition = pushCondition(condition, "patient_id" $eq x)).getOrElse(Unit)
+           (data \ "patient_id").asOpt[String].map(x => condition = pushCondition(condition, "patient_fake_id" $eq x)).getOrElse(Unit)
            (data \ "patient_name").asOpt[String].map(x => condition = pushCondition(condition, "patient_name" $eq x)).getOrElse(Unit)
            (data \ "patient_age").asOpt[Int].map(x => condition = pushCondition(condition, "patient_age" $eq x)).getOrElse(Unit)
              
