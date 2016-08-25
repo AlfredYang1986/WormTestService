@@ -22,7 +22,7 @@ object PatientModule {
     
     def DB2JsValue(obj : MongoDBObject) : JsValue = 
         toJson(Map("patient_id" -> toJson(obj.getAs[String]("patient_id").get),
-                   "patinent_fake_id" -> toJson(obj.getAs[String]("patient_fake_id").get),
+                   "patient_fake_id" -> toJson(obj.getAs[String]("patient_fake_id").get),
                    "patient_name" -> toJson(obj.getAs[String]("patient_name").get),
                    "patient_gender" -> toJson(obj.getAs[Number]("patient_gender").get.intValue),
                    "patient_age" -> toJson(obj.getAs[Number]("patient_age").get.intValue),
@@ -35,8 +35,8 @@ object PatientModule {
         
         def pushPatientImpl : MongoDBObject = {
             val builder = MongoDBObject.newBuilder
-           
-            val patient_fake_id = (data \ "patient_fake_id").asOpt[String].map (x => "patient_id" -> x).getOrElse(throw new Exception("wrong input"))
+            
+            val patient_fake_id = (data \ "patient_fake_id").asOpt[String].map (x => x).getOrElse(throw new Exception("wrong input"))
             builder += "patient_id" -> Sercurity.md5Hash(Sercurity.getTimeSpanWithMillSeconds + patient_fake_id)
             builder += "patient_fake_id" -> patient_fake_id
 //            (data \ "patient_id").asOpt[String].map (x => builder += "patient_id" -> x).getOrElse(throw new Exception("patient_id exist"))
@@ -53,15 +53,15 @@ object PatientModule {
         }
       
         try {
-            val patient_id = (data \ "patient_id").asOpt[String].get
-            (from db() in "patient" where ("patient_id" -> patient_id) select (x => x)).toList match {
-              case Nil => {
+//            val patient_id = (data \ "patient_id").asOpt[String].get
+//            (from db() in "patient" where ("patient_id" -> patient_id) select (x => x)).toList match {
+//              case Nil => {
                   val reVal = pushPatientImpl
                   _data_connection.getCollection("patient") += reVal
                   toJson(Map("status" -> toJson("ok"), "method" -> toJson("pushPatient"), "result" -> toJson(DB2JsValue(reVal))))
-              }
-              case _ => throw new Exception("patient exist")
-            }
+//              }
+//              case _ => throw new Exception("patient exist")
+//            }
         } catch {
           case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
         }
@@ -69,7 +69,7 @@ object PatientModule {
     
     def updatePaient(data : JsValue) : JsValue = 
         try {
-          val patient_id = (data \ "patient_id").asOpt[String].map (x => x).getOrElse(throw new Exception("patient_id needed"))
+          val patient_id = (data \ "patient_id").asOpt[String].map (x => x).getOrElse("")
           
           (from db() in "patient" where ("patient_id" -> patient_id) select (x => x)).toList match {
             case Nil => pushPatient(data)

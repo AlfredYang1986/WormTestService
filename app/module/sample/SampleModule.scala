@@ -76,7 +76,6 @@ object SampleModule {
   
     def JsValue2DBObject(data : JsValue) : Option[MongoDBObject] = {
         val builder = MongoDBObject.newBuilder
-       
         try {
             (data \ "sample_id").asOpt[String].map (tmp => builder += "sample_id" -> tmp).getOrElse(throw new Exception("sample is essential"))
             (data \ "status").asOpt[Int].map(tmp => builder += "status" -> tmp.asInstanceOf[Number]).getOrElse(builder += "status" -> sampleStatus.not_test.t)
