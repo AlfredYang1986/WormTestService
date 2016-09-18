@@ -14,8 +14,8 @@ import java.util.Date
 
 object sampleStatus {
     case object not_test extends sampleStatusDefines(0, "not tested")
-    case object tested extends sampleStatusDefines(1, "not tested")
-    case object published extends sampleStatusDefines(2, "not tested")
+    case object tested extends sampleStatusDefines(1, "tested")
+    case object published extends sampleStatusDefines(2, "published")
 }
 
 sealed abstract class sampleStatusDefines(val t : Int, val des : String)
