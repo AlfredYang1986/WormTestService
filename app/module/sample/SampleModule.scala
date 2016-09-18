@@ -237,6 +237,7 @@ object SampleModule {
               case head :: Nil => {
                 head += "status" -> sampleStatus.tested.t.asInstanceOf[Number]
                 head += "testing_date" -> new Date().getTime.asInstanceOf[Number]
+                head += "testing_doctor" -> (data \ "testing_doctor").asOpt[String].map (x => x).getOrElse(throw new Exception("doctor is needed"))
                 _data_connection.getCollection("sample").update(DBObject("sample_id" -> sample_id), head)
                 toJson(Map("status" -> toJson("ok"), "method" -> toJson("sampleTestComplished"), "result" -> toJson("success")))
               }
@@ -253,6 +254,7 @@ object SampleModule {
               case head :: Nil => {
                 head += "status" -> sampleStatus.published.t.asInstanceOf[Number] 
                 head += "reporting_date" -> new Date().getTime.asInstanceOf[Number]
+                head += "post_test_doctor" -> (data \ "post_test_doctor").asOpt[String].map (x => x).getOrElse(throw new Exception("doctor is needed"))
                 _data_connection.getCollection("sample").update(DBObject("sample_id" -> sample_id), head)
                 toJson(Map("status" -> toJson("ok"), "method" -> toJson("sampleTestPublished"), "result" -> toJson("success")))
               }
