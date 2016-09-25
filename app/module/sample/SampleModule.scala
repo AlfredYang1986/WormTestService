@@ -290,7 +290,7 @@ object SampleModule {
             (from db() in "sample" where ("sample_id" -> sample_id) select (x => x)).toList match {
               case head :: Nil => {
                 val ori = head.getAs[MongoDBList]("result").get.toList.asInstanceOf[List[String]]
-                head += "result" -> (ori union result).distinct
+                head += "result" -> result.distinct
                 _data_connection.getCollection("sample").update(DBObject("sample_id" -> sample_id), head)
                 toJson(Map("status" -> toJson("ok"), "method" -> toJson("samplePushTestResult"), "result" -> toJson("success")))
               }
