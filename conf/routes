@@ -14,7 +14,8 @@ POST	 /sample/query/nt			 controllers.SampleController.queryNotTestSample
 POST	 /sample/query/id			 controllers.SampleController.querySampleWithID
 
 POST 	 /sample/complish			 controllers.SampleController.sampleTestComplished
-# POST	 /sample/publish			 controllers.SampleController.sampleTestComplished
+POST	 /sample/adjusted			 controllers.SampleController.sampleTestAdjusted
+POST	 /sample/printed			 controllers.SampleController.sampleTestPrinted
 
 POST	 /sample/result/push 		 controllers.SampleController.samplePushTestResult
 

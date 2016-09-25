@@ -18,7 +18,8 @@ object SampleController extends Controller {
     def querySampleWithID = Action (request => requestArgs(request)(SampleModule.querySampleWithID))
     
     def sampleTestComplished = Action (request => requestArgs(request)(SampleModule.sampleTestComplished))
-    def sampleTestPublished = Action (request => requestArgs(request)(SampleModule.sampleTestComplished))
+    def sampleTestAdjusted = Action (request => requestArgs(request)(SampleModule.sampleTestAdjusted))
+    def sampleTestPrinted = Action (request => requestArgs(request)(SampleModule.sampleTestPrinted))
 
     def samplePushTestResult = Action (request => requestArgs(request)(SampleModule.samplePushTestResult))
 

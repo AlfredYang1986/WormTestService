@@ -13,9 +13,10 @@ import module.patient.PatientModule
 import java.util.Date
 
 object sampleStatus {
-    case object not_test extends sampleStatusDefines(0, "not tested")
+    case object pushed extends sampleStatusDefines(0, "pushed")
     case object tested extends sampleStatusDefines(1, "tested")
-    case object published extends sampleStatusDefines(2, "published")
+    case object adjuested extends sampleStatusDefines(2, "adjusted")
+    case object printed extends sampleStatusDefines(3, "printed")
 }
 
 sealed abstract class sampleStatusDefines(val t : Int, val des : String)
@@ -78,7 +79,7 @@ object SampleModule {
         val builder = MongoDBObject.newBuilder
         try {
             (data \ "sample_id").asOpt[String].map (tmp => builder += "sample_id" -> tmp).getOrElse(throw new Exception("sample is essential"))
-            (data \ "status").asOpt[Int].map(tmp => builder += "status" -> tmp.asInstanceOf[Number]).getOrElse(builder += "status" -> sampleStatus.not_test.t)
+            (data \ "status").asOpt[Int].map(tmp => builder += "status" -> tmp.asInstanceOf[Number]).getOrElse(builder += "status" -> sampleStatus.pushed.t)
             (data \ "resource").asOpt[String].map(tmp => builder += "resource" -> tmp).getOrElse(builder += "resource" -> "")
            
             (data \ "start_date").asOpt[Long].map (tmp => builder += "start_date" -> tmp).getOrElse(builder += "start_date" -> 0.longValue)
@@ -100,7 +101,7 @@ object SampleModule {
            
             val date = new Date().getTime / (24 * 60 * 60 * 1000)
             builder += "index_of_day" -> (from db() in "sample" where ("date" -> date) select (x => x)).count
-            builder += "status" -> sampleStatus.not_test.t
+            builder += "status" -> sampleStatus.pushed.t
             builder += "date" -> date
             builder += "images" -> MongoDBList.newBuilder.result
             builder += "result" -> MongoDBList.newBuilder.result
@@ -195,7 +196,7 @@ object SampleModule {
     
     def queryNotTestSample(data : JsValue) : JsValue = {
         try {
-            val status = sampleStatus.not_test.t
+            val status = sampleStatus.pushed.t
             toJson(Map("status" -> toJson("ok"), "method" -> toJson("queryNotTestSample"), "result" -> toJson(
                   (from db() in "sample" where ("status" -> status) select (DB2JsValue(_))).toList)))
           
@@ -206,7 +207,7 @@ object SampleModule {
 
     def queryTestedSample(data : JsValue) : JsValue = {
         try {
-            val status = sampleStatus.not_test.t
+            val status = sampleStatus.pushed.t
             val reVal = ((from db() in "sample" where ("status" $ne status) select (DB2JsValue(_))).toList)
             val reVal_s = reVal.sortBy (x => (x \ "status").asOpt[Int].get)
             toJson(Map("status" -> toJson("ok"), "method" -> toJson("queryTestedSample"), "result" -> toJson(reVal_s)))
@@ -247,12 +248,12 @@ object SampleModule {
           case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
         }
         
-    def sampleTestPublished(data : JsValue) : JsValue = 
+    def sampleTestAdjusted(data : JsValue) : JsValue = 
         try {
             val sample_id = (data \ "sample_id").asOpt[String].map (x => x).getOrElse(throw new Exception("sample id needed"))
             (from db() in "sample" where ("sample_id" -> sample_id) select (x => x)).toList match {
               case head :: Nil => {
-                head += "status" -> sampleStatus.published.t.asInstanceOf[Number] 
+                head += "status" -> sampleStatus.adjuested.t.asInstanceOf[Number] 
                 head += "reporting_date" -> new Date().getTime.asInstanceOf[Number]
                 head += "post_test_doctor" -> (data \ "post_test_doctor").asOpt[String].map (x => x).getOrElse(throw new Exception("doctor is needed"))
                 _data_connection.getCollection("sample").update(DBObject("sample_id" -> sample_id), head)
@@ -264,6 +265,23 @@ object SampleModule {
           case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
         }
 
+    def sampleTestPrinted(data : JsValue) : JsValue = 
+        try {
+            val sample_id = (data \ "sample_id").asOpt[String].map (x => x).getOrElse(throw new Exception("sample id needed"))
+            (from db() in "sample" where ("sample_id" -> sample_id) select (x => x)).toList match {
+              case head :: Nil => {
+                head += "status" -> sampleStatus.printed.t.asInstanceOf[Number] 
+//                head += "reporting_date" -> new Date().getTime.asInstanceOf[Number]
+//                head += "post_test_doctor" -> (data \ "post_test_doctor").asOpt[String].map (x => x).getOrElse(throw new Exception("doctor is needed"))
+                _data_connection.getCollection("sample").update(DBObject("sample_id" -> sample_id), head)
+                toJson(Map("status" -> toJson("ok"), "method" -> toJson("sampleTestPublished"), "result" -> toJson("success")))
+              }
+              case _ => throw new Exception("")
+            }
+        } catch {
+          case ex : Exception => ErrorCode.errorToJson(ex.getMessage)
+        }
+        
     def samplePushTestResult(data : JsValue) : JsValue =
         try {
             val sample_id = (data \ "sample_id").asOpt[String].map (x => x).getOrElse(throw new Exception("sample id needed"))
@@ -307,7 +325,8 @@ object SampleModule {
                                                                       
        try {
            var condition : DBObject = null
-           (data \ "time").asOpt[Long].map (x => condition = pushCondition(condition, "date" $eq 1 + x / (24 * 60 * 60 * 1000))).getOrElse(Unit)
+           (data \ "time").asOpt[Long].map (x => condition = pushCondition(condition, "date" $gte 1 + x / (24 * 60 * 60 * 1000))).getOrElse(Unit)
+           (data \ "time_end").asOpt[Long].map (x => condition = pushCondition(condition, "date" $lte 1 + x / (24 * 60 * 60 * 1000))).getOrElse(Unit)
            (data \ "testing_doctor").asOpt[String].map (x => condition = pushCondition(condition, "testing_doctor" $eq x)).getOrElse(Unit)
            (data \ "sample_id").asOpt[String].map (x => condition = pushCondition(condition, "sample_id" $eq x)).getOrElse(Unit)
            (data \ "post_test_doctor").asOpt[String].map (x => condition = pushCondition(condition, "post_test_doctor" $eq x)).getOrElse(Unit)
